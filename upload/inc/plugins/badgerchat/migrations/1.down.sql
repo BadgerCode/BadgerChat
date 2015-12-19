@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS `{MYBB_TABLE_PREFIX}badgerchat_messages`;
+DROP TABLE IF EXISTS `{MYBB_TABLE_PREFIX}badgerchat_version`;

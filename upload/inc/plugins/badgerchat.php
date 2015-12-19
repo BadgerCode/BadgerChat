@@ -20,25 +20,17 @@ function badgerchat_info(){
 
 function badgerchat_install(){
     // TODO: Proper migration management
-    global $db;
-    $migrationQueries = explode(";", file_get_contents(MYBB_ROOT . "inc/plugins/badgerchat/migrations/1.sql"));
-    foreach($migrationQueries AS $migrationQuery) {
-        $trimmedQuery = trim($migrationQuery);
-        if(empty($trimmedQuery)){
-            continue;
-        }
-
-        $db->write_query($trimmedQuery);
-    }
+    badgerchat_RunDBMigration("1");
 }
 
 function badgerchat_is_installed(){
     // TODO: Proper migration management
-    return badgerchat_GetCurrentDBVersion() == 1;
+    global $db;
+    return $db->table_exists("badgerchat_version") && badgerchat_GetCurrentDBVersion() == 1;
 }
 
 function badgerchat_uninstall(){
-
+    badgerchat_RunDBMigration("1.down");
 }
 
 function badgerchat_activate(){
@@ -47,6 +39,21 @@ function badgerchat_activate(){
 
 function badgerchat_deactivate(){
 
+}
+
+function badgerchat_RunDBMigration($scriptNumber){
+    global $db;
+    $migrationQueries = explode(";", file_get_contents(MYBB_ROOT . "inc/plugins/badgerchat/migrations/{$scriptNumber}.sql"));
+
+    foreach($migrationQueries AS $migrationQuery) {
+        $trimmedQuery = trim($migrationQuery);
+        if(empty($trimmedQuery)){
+            continue;
+        }
+        $expandedQuery = str_replace("{MYBB_TABLE_PREFIX}", TABLE_PREFIX, $trimmedQuery);
+
+        $db->write_query($expandedQuery);
+    }
 }
 
 function badgerchat_GetCurrentDBVersion(){
