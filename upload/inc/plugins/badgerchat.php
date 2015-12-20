@@ -9,7 +9,8 @@ $plugins->add_hook("pre_output_page", "badgerchat_Insert_Index_ChatBox");
 function badgerchat_Templates()
 {
     return array(
-        "badgerchat_index_chatbox"
+        "badgerchat_index_chatbox",
+        "badgerchat_index_style"
     );
 }
 
@@ -118,6 +119,9 @@ function badgerchat_Insert_Index_ChatBox($page)
 {
     global $templates;
 
-    $chatBox = $templates->get("badgerchat_index_chatbox");
+    $chatBox = "";
+    eval("\$chatBox = \"".$templates->get("badgerchat_index_style")."\";");
+    eval("\$chatBox .= \"".$templates->get("badgerchat_index_chatbox")."\";");
+
     return str_replace("{badgerchat_index_chatbox}", $chatBox, $page);
 }
