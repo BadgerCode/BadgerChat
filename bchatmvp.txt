@@ -1,0 +1,78 @@
+MVP:
+Global chatbox
+- Visible on index page
+	- All non-guest, non-banned users
+	- Have to manually put chatbox PHP variable into index template
+- Add messages
+	- All non-guest, non-banned users
+	- UserId, message, Ip, DateTime
+	- Message max length: 200
+	- Anti-spam: One per second
+- Auto-refresh
+	- Record datetime of newest message loaded
+	- Every 5 seconds, get any messages newer than this datetime
+		- And update newest message datetime
+- Link at bottom of chat box to load 20 older messages
+- On page load, show last 10 messages
+
+
+BadgerChat
+=====
+Global Chatbox
+- Visible on index page
+	- Between header/navbar and forums list
+	- Could make it show on every other page in a mini version
+	- All non-guest, non-banned users can see it and the messages in it
+- Users can type in messages to send to add to the chat box 						
+	- Records their UserId, message, Ip and the datetime of the message
+	- Max length: TODO
+	- Anti-spam delay
+- Auto-refresh
+	- MVP: Only load new shouts
+	- Loads changes made to the chat (e.g. adding messages, deleting)
+- On page load, loads past messages
+	- Last X?
+	- Everything since the user last logged in?
+- Can scroll to load more messages
+- Ignore/Block users
+- Report messages
+	- Report multiple messages or allow admins to browse chat box at time of message?
+- Users can like other users messages
+	- Tie this in with existing like system?
+	- Separate like system with option to do X on like?
+- Users can delete their own shouts
+- Users can edit their own shouts
+	- Save edit history for administration reasons?
+	
+Administration
+- Announcements
+- Ban users from chatbox
+- Delete messages
+	- Make it easy to select multiple messages to delete
+- Hide messages
+- See user IPs
+- See & respond to reports
+- Option of whitelist or blacklist of groups who can view the shoutbox
+
+
+
+Private Messages
+- Can send messages to specific users
+	- Maybe allow groups?
+- Separate tabs for each user/group
+- To PM someone
+	- Click their name?
+	- Click a button next to their name
+	- Can close chat sessions
+		- Separate action from leaving session?
+	- Can type name of person to private messages 
+	
+
+Development
+- Prevent external users from seeing migration scripts
+- Proper database migration management
+	- Detect & install migrations in order on install
+	- Same, but reverse for down migrations on uninstall
+	- Detect version and install new versions on activate
+- Cache templates before using them
+- Tidier way of injecting CSS
