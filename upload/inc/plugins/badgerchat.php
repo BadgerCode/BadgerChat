@@ -132,34 +132,73 @@ function badgerchat_InsertIndexChatBox($page)
 function badgerchat_AsyncRequests()
 {
     global $mybb, $charset;
+    $result = "";
 
     if($mybb->input['action'] == "badgerchat"){
         switch($mybb->input['chatboxAction']){
             case "loadRecentMessages":
-                badgerchat_loadRecentMessages();
+                $result = badgerchat_loadRecentMessages(20);
+                break;
+            case "addMessage":
+                //TODO: Add message
                 break;
         }
     }
+
+    echo json_encode($result);
 }
 
-function badgerchat_loadRecentMessages()
+function badgerchat_loadRecentMessages($messageCount)
 {
     global $db;
-    $db->simple_select(
+    $messages = array();
+
+    $query = $db->simple_select(
         "badgerchat_messages",
-        "`Id`, `SentAt`, `uid`, `Ip`, `Messages`",
+        "`Id`, `SentAt`, `uid`, `Ip`, `Message`",
         "",
         array(
             "order_by"   => "SentAt",
             "order_dir"  => "DESC",
-            "limit"      => 20
+            "limit"      => $messageCount
         )
     );
 
+    //TODO: Get back more info on the user (name styling)
+    while($row = $db->fetch_array($query))
+    {
+        array_push($messages, new badgerchat_Message(
+            $row["Id"],
+            $row["SentAt"],
+            $row["uid"],
+            $row["Ip"],
+            $row["Message"]
+        ));
+    }
 
+    return $messages;
 }
 
-class badgerchat_Row{
+class badgerchat_Message
+{
+    public $Id;
+    public $SentAt;
+    public $User;
+    public $Ip;
+    private $Message;
+
+    function __construct($Id, $SentAt, $User, $Ip, $Message)
+    {
+        $this->Id = $Id;
+        $this->SentAt = $SentAt;
+        $this->User = $User;
+        $this->Ip = $Ip;
+        $this->Message = $Message;
+    }
+}
+
+class badgerchat_Row
+{
     public $User;
     public $Message;
 
