@@ -56,11 +56,16 @@ function badgerchat_uninstall()
 
 function badgerchat_activate()
 {
-    //badgerchat_AddTemplate("badgerchat_index_chatbox");
+    foreach(badgerchat_Templates() AS $templateName) {
+        badgerchat_AddTemplate($templateName);
+    }
 }
 
-function badgerchat_deactivate(){
-    //badgerchat_RemoveTemplate("badgerchat_index_chatbox");
+function badgerchat_deactivate()
+{
+    foreach(badgerchat_Templates() AS $templateName) {
+        badgerchat_RemoveTemplate($templateName);
+    }
 }
 
 function badgerchat_RunDBMigration($scriptNumber){
