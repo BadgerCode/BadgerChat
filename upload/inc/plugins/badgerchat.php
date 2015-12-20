@@ -5,13 +5,13 @@ if(!defined("IN_MYBB")){
 }
 
 $plugins->add_hook("pre_output_page", "badgerchat_InsertIndexChatBox");
+$plugins->add_hook("xmlhttp", "badgerchat_AsyncRequests");
 
 function badgerchat_Templates()
 {
     return array(
         "badgerchat_index_chatbox",
-        "badgerchat_index_style",
-        "badgerchat_index_chatbox_row"
+        "badgerchat_index_style"
     );
 }
 
@@ -87,7 +87,8 @@ function badgerchat_RunDBMigration($scriptNumber){
 function badgerchat_GetCurrentDBVersion(){
     global $db;
 
-    $query = $db->simple_select("badgerchat_version",
+    $query = $db->simple_select(
+        "badgerchat_version",
         "Version",
         "",
         array("order_by" => "InstalledAt", "order_dir" => "DESC", "limit" => "1"));
@@ -121,8 +122,6 @@ function badgerchat_InsertIndexChatBox($page)
     // TODO: Don't load messages until async request after page load
     global $templates;
 
-    $chatBoxRows = badgerchat_MockGenerateHTMLRows(badgerchat_MockChatData());
-
     $chatBox = "";
     eval("\$chatBox = \"".$templates->get("badgerchat_index_style")."\";");
     eval("\$chatBox .= \"".$templates->get("badgerchat_index_chatbox")."\";");
@@ -130,36 +129,34 @@ function badgerchat_InsertIndexChatBox($page)
     return str_replace("{badgerchat_index_chatbox}", $chatBox, $page);
 }
 
-function badgerchat_MockGenerateHTMLRow($row)
+function badgerchat_AsyncRequests()
 {
-    global $templates;
-    $name = $row->User;
-    $message = $row->Message;
+    global $mybb, $charset;
 
-    $rowHTML = "";
-    eval("\$rowHTML = \"" . $templates->get("badgerchat_index_chatbox_row") . "\";");
-    return $rowHTML;
-}
-
-function badgerchat_MockGenerateHTMLRows($rows)
-{
-    $rowsHTML = "";
-
-    foreach($rows as $row)
-    {
-        $rowsHTML .= badgerchat_MockGenerateHTMLRow($row);
+    if($mybb->input['action'] == "badgerchat"){
+        switch($mybb->input['chatboxAction']){
+            case "loadRecentMessages":
+                badgerchat_loadRecentMessages();
+                break;
+        }
     }
-
-    return $rowsHTML;
 }
 
-function badgerchat_MockChatData(){
-    return Array(
-        new badgerchat_Row("Badger", "Hello world!"),
-        new badgerchat_Row("Badger", "Message"),
-        new badgerchat_Row("Badger", "Another message"),
-        new badgerchat_Row("Badger", "Goodbye")
+function badgerchat_loadRecentMessages()
+{
+    global $db;
+    $db->simple_select(
+        "badgerchat_messages",
+        "`Id`, `SentAt`, `uid`, `Ip`, `Messages`",
+        "",
+        array(
+            "order_by"   => "SentAt",
+            "order_dir"  => "DESC",
+            "limit"      => 20
+        )
     );
+
+
 }
 
 class badgerchat_Row{
