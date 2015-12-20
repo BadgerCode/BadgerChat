@@ -4,12 +4,19 @@ if(!defined("IN_MYBB")){
     die();
 }
 
-$templates = array(
-  "badgerchat_index_chatbox"
-);
-$databaseVersion = 1;
-
 $plugins->add_hook("pre_output_page", "badgerchat_Insert_Index_ChatBox");
+
+function badgerchat_Templates()
+{
+    return array(
+        "badgerchat_index_chatbox"
+    );
+}
+
+function badgerchat_DatabaseVersion()
+{
+    return 1;
+}
 
 function badgerchat_info(){
     return array(
@@ -26,41 +33,34 @@ function badgerchat_info(){
 
 function badgerchat_install()
 {
-    global $databaseVersion;
-    for($version = 1; $version <= $databaseVersion; $version++)
+    for($version = 0; $version <= badgerchat_DatabaseVersion(); $version++)
     {
-        badgerchat_RunDBMigration($version);
+        badgerchat_RunDBMigration("$version");
     }
 }
 
 function badgerchat_is_installed()
 {
-    global $db, $databaseVersion;
+    global $db;
     return $db->table_exists("badgerchat_version")
-           && badgerchat_GetCurrentDBVersion() == $databaseVersion;
+           && badgerchat_GetCurrentDBVersion() == badgerchat_DatabaseVersion();
 }
 
 function badgerchat_uninstall()
 {
     for($version = badgerchat_GetCurrentDBVersion(); $version > 0; $version--)
     {
-        badgerchat_RunDBMigration($version);
+        badgerchat_RunDBMigration("{$version}.down");
     }
 }
 
 function badgerchat_activate()
 {
-    global $templates;
-    foreach ($templates as $templateName) {
-        badgerchat_AddTemplate($templateName);
-    }
+    //badgerchat_AddTemplate("badgerchat_index_chatbox");
 }
 
 function badgerchat_deactivate(){
-    global $templates;
-    foreach ($templates as $templateName) {
-        badgerchat_RemoveTemplate($templateName);
-    }
+    //badgerchat_RemoveTemplate("badgerchat_index_chatbox");
 }
 
 function badgerchat_RunDBMigration($scriptNumber){
@@ -73,7 +73,6 @@ function badgerchat_RunDBMigration($scriptNumber){
             continue;
         }
         $expandedQuery = str_replace("{MYBB_TABLE_PREFIX}", TABLE_PREFIX, $trimmedQuery);
-
         $db->write_query($expandedQuery);
     }
 }
