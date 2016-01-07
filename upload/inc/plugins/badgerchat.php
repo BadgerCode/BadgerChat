@@ -131,7 +131,7 @@ function badgerchat_InsertIndexChatBox($page)
 
 function badgerchat_AsyncRequests()
 {
-    global $mybb, $charset;
+    global $mybb;
     $result = "";
 
     if($mybb->input['action'] == "badgerchat"){
