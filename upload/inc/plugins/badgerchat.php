@@ -35,7 +35,7 @@ function badgerchat_info(){
 
 function badgerchat_install()
 {
-    for($version = 0; $version <= badgerchat_DatabaseVersion(); $version++)
+    for($version = 1; $version <= badgerchat_DatabaseVersion(); $version++)
     {
         badgerchat_RunDBMigration("$version");
     }
