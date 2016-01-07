@@ -4,6 +4,15 @@ if(!defined("IN_MYBB")){
     die();
 }
 
+class BadgerChatConfiguration {
+
+    static $InstallDirectory = MYBB_ROOT . "inc/plugins/badgerchat/";
+    static $DatabaseVersion = 1;
+}
+
+require_once(BadgerChatConfiguration::$InstallDirectory . "services/AsyncRequestProcessor.php");
+
+
 $plugins->add_hook("pre_output_page", "badgerchat_InsertIndexChatBox");
 $plugins->add_hook("xmlhttp", "badgerchat_AsyncRequests");
 
@@ -13,11 +22,6 @@ function badgerchat_Templates()
         "badgerchat_index_chatbox",
         "badgerchat_index_style"
     );
-}
-
-function badgerchat_DatabaseVersion()
-{
-    return 1;
 }
 
 function badgerchat_info(){
@@ -35,7 +39,7 @@ function badgerchat_info(){
 
 function badgerchat_install()
 {
-    for($version = 1; $version <= badgerchat_DatabaseVersion(); $version++)
+    for($version = 1; $version <= BadgerChatConfiguration::$DatabaseVersion; $version++)
     {
         badgerchat_RunDBMigration("$version");
     }
@@ -45,7 +49,7 @@ function badgerchat_is_installed()
 {
     global $db;
     return $db->table_exists("badgerchat_version")
-           && badgerchat_GetCurrentDBVersion() == badgerchat_DatabaseVersion();
+           && badgerchat_GetCurrentDBVersion() == BadgerChatConfiguration::$DatabaseVersion;
 }
 
 function badgerchat_uninstall()
@@ -72,7 +76,7 @@ function badgerchat_deactivate()
 
 function badgerchat_RunDBMigration($scriptNumber){
     global $db;
-    $migrationQueries = explode(";", file_get_contents(MYBB_ROOT . "inc/plugins/badgerchat/migrations/{$scriptNumber}.sql"));
+    $migrationQueries = explode(";", file_get_contents(BadgerChatConfiguration::$InstallDirectory . "migrations/{$scriptNumber}.sql"));
 
     foreach($migrationQueries AS $migrationQuery) {
         $trimmedQuery = trim($migrationQuery);
@@ -102,7 +106,7 @@ function badgerchat_AddTemplate($templateName)
 {
     global $db;
 
-    $template = file_get_contents(MYBB_ROOT . "inc/plugins/badgerchat/templates/{$templateName}.html");
+    $template = file_get_contents(BadgerChatConfiguration::$InstallDirectory . "templates/{$templateName}.html");
     $templateArray = array(
         "title"     => $templateName,
         "template"  => $db->escape_string($template),
@@ -132,79 +136,10 @@ function badgerchat_InsertIndexChatBox($page)
 function badgerchat_AsyncRequests()
 {
     global $mybb;
-    $result = "";
 
     if($mybb->input['action'] == "badgerchat"){
-        switch($mybb->input['chatboxAction']){
-            case "loadRecentMessages":
-                $result = badgerchat_loadRecentMessages(20);
-                break;
-            case "addMessage":
-                //TODO: Add message
-                break;
-        }
-    }
-
-    echo json_encode($result);
-}
-
-function badgerchat_loadRecentMessages($messageCount)
-{
-    global $db;
-    $messages = array();
-
-    $query = $db->simple_select(
-        "badgerchat_messages",
-        "`Id`, `SentAt`, `uid`, `Ip`, `Message`",
-        "",
-        array(
-            "order_by"   => "SentAt",
-            "order_dir"  => "DESC",
-            "limit"      => $messageCount
-        )
-    );
-
-    //TODO: Get back more info on the user (name styling)
-    while($row = $db->fetch_array($query))
-    {
-        array_push($messages, new badgerchat_Message(
-            $row["Id"],
-            $row["SentAt"],
-            $row["uid"],
-            $row["Ip"],
-            $row["Message"]
-        ));
-    }
-
-    return $messages;
-}
-
-class badgerchat_Message
-{
-    public $Id;
-    public $SentAt;
-    public $User;
-    public $Ip;
-    private $Message;
-
-    function __construct($Id, $SentAt, $User, $Ip, $Message)
-    {
-        $this->Id = $Id;
-        $this->SentAt = $SentAt;
-        $this->User = $User;
-        $this->Ip = $Ip;
-        $this->Message = $Message;
-    }
-}
-
-class badgerchat_Row
-{
-    public $User;
-    public $Message;
-
-    function __construct($User, $Message)
-    {
-        $this->User = $User;
-        $this->Message = $Message;
+        $result = AsyncRequestProcessor::ProcessRequest($mybb->input['chatboxRequestType']);
+        echo json_encode($result);
+        return;
     }
 }
