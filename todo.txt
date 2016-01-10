@@ -1,0 +1,11 @@
+# Set up JavaScript constants provider
+    - Each page can have its own data file
+    - The data file is a Template with just a javascript table in it 
+        (Within script tags)
+    - In the template for the page which needs the file, 
+        add the name of the data table inside curly brackets to the page
+    - Wherever this template is rendered, a JavaScript constants builder 
+        will need to be used to render the constants file and then 
+	add it to the template
+# Set up JavaScript configs for index page
+    - Just load request URL now
