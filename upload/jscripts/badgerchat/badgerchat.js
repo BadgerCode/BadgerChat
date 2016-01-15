@@ -4,7 +4,7 @@ $(document).ready(function(){
 });
 
 function badgerchat_loadMessages(chatBoxBody){
-    $.post(badgerchat_data.loadUrl, {})
+    $.get(badgerchat_data.loadUrl)
         .done(function(messages) {
             var deserialisedMessages = JSON.parse(messages);
             badgerchat_clearMessages(chatBoxBody);
