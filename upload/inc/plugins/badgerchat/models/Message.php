@@ -5,7 +5,7 @@ class Message
     public $SentAt;
     public $User;
     public $Ip;
-    private $Message;
+    public $Message;
 
     function __construct($Id, $SentAt, $User, $Ip, $Message)
     {

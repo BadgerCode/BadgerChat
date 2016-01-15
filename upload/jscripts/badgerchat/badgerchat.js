@@ -1,13 +1,18 @@
 $(document).ready(function(){
-
     var chatBoxBody = $(".badgerchat-index-chatbox-body");
     badgerchat_loadMessages(chatBoxBody)
 });
 
 function badgerchat_loadMessages(chatBoxBody){
-    var messages = badgerchat_getMessages();
-    badgerchat_clearMessages(chatBoxBody);
-    badgerchat_renderMessages(chatBoxBody, messages);
+    $.post(badgerchat_data.loadUrl, {})
+        .done(function(messages) {
+            var deserialisedMessages = JSON.parse(messages);
+            badgerchat_clearMessages(chatBoxBody);
+            badgerchat_renderMessages(chatBoxBody, deserialisedMessages);
+        })
+        .fail(function() {
+            alert("Error loading messages");
+        });
 }
 
 function badgerchat_getMessages(){
