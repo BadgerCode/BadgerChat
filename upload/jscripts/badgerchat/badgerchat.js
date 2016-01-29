@@ -1,34 +1,32 @@
-$(document).ready(function(){
-    var chatBoxBody = $(".badgerchat-index-chatbox-body");
-    badgerchat_loadMessages(chatBoxBody)
-});
-
-function badgerchat_loadMessages(chatBoxBody){
+//TODO: Put into class
+function badgerchat_loadMessages(successCallback, errorCallback){
     $.get(badgerchat_data.loadUrl)
         .done(function(messages) {
+            // TODO: try catch
             var deserialisedMessages = JSON.parse(messages);
-            badgerchat_clearMessages(chatBoxBody);
-            badgerchat_renderMessages(chatBoxBody, deserialisedMessages);
+            successCallback(deserialisedMessages);
         })
         .fail(function() {
-            alert("Error loading messages");
+            errorCallback();
         });
 }
 
-function badgerchat_getMessages(){
-    return [
-        { User: "Badger", Message: "Hello world!"},
-        { User: "Badger", Message: "etc!"},
-        { User: "Badger", Message: "bye!"},
-    ];
-}
+var badgerchat_addMessage_responses = {
+    Success: 1,
+    Unauthorised: 2
+};
 
-function badgerchat_clearMessages(chatBoxBody){
-    chatBoxBody.html("");
-}
-
-function badgerchat_renderMessages(chatBoxBody, messages){
-    $.each(messages, function(index, message){
-        chatBoxBody.append("<div class=\"badgerchat-index-chatbox-row\">" + message.User + ": " + message.Message + "</div>");
-    });
+function badgerchat_addMessage(message, successCallback, errorCallback){
+    $.post(badgerchat_data.addMessageUrl, {badgerchat_Message: message})
+        .done(function(result){
+            if(result == badgerchat_addMessage_responses.Success){
+                successCallback(message);
+            }
+            else {
+                errorCallback(result);
+            }
+        })
+        .fail(function(){
+            errorCallback(-1);
+        });
 }

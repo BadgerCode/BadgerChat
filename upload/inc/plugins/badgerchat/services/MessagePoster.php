@@ -3,14 +3,21 @@
 class MessagePosterResult {
     static $Success = 1;
     static $Unauthorised = 2;
+    static $NoMessage = 3;
 }
 
 class MessagePoster
 {
-    static function PostMessage($postKey, $message)
+    // TODO: Return message object
+    static function PostMessage($user, $message)
     {
-        if (!verify_post_check($postKey, true)) {
+        if ($user == null) {
             return MessagePosterResult::$Unauthorised;
+        }
+
+        // TODO: Checks for null and empty string?
+        if(empty($message)){
+            return MessagePosterResult::$NoMessage;
         }
 
         return MessagePosterResult::$Success;
