@@ -40,7 +40,7 @@ $(document).ready(function(){
                 // TODO: Use returned message object
                 AddMessage({User: "You", Message: addedMessage});
             }, function(reason){
-                console.log(reason);
+                console.log("Failed: " + reason);
                 inputBox.attr("disabled", false);
             }
         );

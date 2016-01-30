@@ -24,7 +24,7 @@ class MessageLoader
             "`SentAt` < $formattedStartDate",
             array(
                 "order_by"   => "SentAt",
-                "order_dir"  => "DESC",
+                "order_dir"  => "ASC",
                 "limit"      => $count
             )
         );

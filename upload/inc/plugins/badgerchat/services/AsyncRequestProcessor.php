@@ -23,16 +23,9 @@ class AsyncRequestProcessor {
             case AsyncRequestTypes::$LoadMostRecentMessages:
                 return MessageLoader::LoadFromBeforeStartDate(new DateTime(), 20);
             case AsyncRequestTypes::$PostMessage:
-                return MessagePoster::PostMessage($mybb->user, $_POST['badgerchat_message']);
+                return MessagePoster::PostMessage($mybb->user, get_ip(), $_POST['badgerchat_message']);
             default:
                 return "Unknown request type";
         }
-    }
-}
-
-class MessageFactory {
-    function __construct()
-    {
-
     }
 }

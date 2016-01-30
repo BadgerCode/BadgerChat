@@ -17,7 +17,7 @@ var badgerchat_addMessage_responses = {
 };
 
 function badgerchat_addMessage(message, successCallback, errorCallback){
-    $.post(badgerchat_data.addMessageUrl, {badgerchat_Message: message})
+    $.post(badgerchat_data.addMessageUrl, { "badgerchat_message" : message })
         .done(function(result){
             if(result == badgerchat_addMessage_responses.Success){
                 successCallback(message);
