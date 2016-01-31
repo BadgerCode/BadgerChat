@@ -19,11 +19,12 @@ var badgerchat_addMessage_responses = {
 function badgerchat_addMessage(message, successCallback, errorCallback){
     $.post(badgerchat_data.addMessageUrl, { "badgerchat_message" : message })
         .done(function(result){
-            if(result == badgerchat_addMessage_responses.Success){
-                successCallback(message);
+            var resultObject = JSON.parse(result);
+            if(resultObject.Status == badgerchat_addMessage_responses.Success){
+                successCallback(resultObject.Message);
             }
             else {
-                errorCallback(result);
+                errorCallback(resultObject.Status);
             }
         })
         .fail(function(){

@@ -38,7 +38,7 @@ $(document).ready(function(){
                 inputBox.attr("disabled", false);
 
                 // TODO: Use returned message object
-                AddMessage({User: "You", Message: addedMessage});
+                AddMessage(addedMessage);
             }, function(reason){
                 console.log("Failed: " + reason);
                 inputBox.attr("disabled", false);
