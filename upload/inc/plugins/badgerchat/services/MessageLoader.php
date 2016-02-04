@@ -6,6 +6,7 @@ if(!defined("IN_MYBB")){
 
 $InstallDirectory = MYBB_ROOT . "inc/plugins/badgerchat/";
 
+require_once($InstallDirectory . "services/UsernameFormatter.php");
 require_once($InstallDirectory . "models/Message.php");
 require_once($InstallDirectory . "models/ChatBoxRow.php");
 require_once MYBB_ROOT . "inc/class_parser.php";
@@ -13,21 +14,22 @@ require_once MYBB_ROOT . "inc/class_parser.php";
 class MessageLoader
 {
     static function LoadFromBeforeStartDate(DateTime $startDate, $count){
-        global $db, $parser;
+        global $db, $parser, $mybb;
 
         $messages = array();
 
         $formattedStartDate = $startDate->format("'Y-m-d H:i:s'");
 
-        $query = $db->simple_select(
-            "badgerchat_messages",
-            "`Id`, `SentAt`, `uid`, `Ip`, `Message`",
-            "`SentAt` < $formattedStartDate",
-            array(
-                "order_by"   => "SentAt",
-                "order_dir"  => "ASC",
-                "limit"      => $count
-            )
+        $TABLE_PREFIX = TABLE_PREFIX;
+        $query = $db->query("SELECT * FROM(
+                                SELECT m.`Id`, m.`SentAt`, m.`uid`, m.`Ip`, m.`Message`,
+                                    u.`username`, u.`usergroup`, u.`displaygroup`
+                                FROM {$TABLE_PREFIX}badgerchat_messages m
+                                INNER JOIN {$TABLE_PREFIX}users u ON u.uid = m.uid
+                                WHERE m.`SentAt` < {$formattedStartDate}
+                                ORDER BY m.`SentAt` DESC LIMIT {$count}
+                             ) messages
+                             ORDER BY SentAt ASC"
         );
 
         $parser = new postParser;
@@ -44,10 +46,12 @@ class MessageLoader
         {
             $parsedMessage = $parser->parse_message($row['Message'], $parser_options);
 
+            $displayName = UsernameFormatter::Format($row['uid'], $row['username'], $row['usergroup'], $row['displaygroup']);
+
             array_push($messages, new Message(
                 $row["Id"],
                 $row["SentAt"],
-                $row["uid"],
+                $displayName,
                 $row["Ip"],
                 $parsedMessage
             ));

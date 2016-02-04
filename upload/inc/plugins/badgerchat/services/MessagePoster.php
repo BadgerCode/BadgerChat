@@ -2,6 +2,7 @@
 
 $InstallDirectory = MYBB_ROOT . "inc/plugins/badgerchat/";
 
+require_once($InstallDirectory . "services/UsernameFormatter.php");
 require_once($InstallDirectory . "models/Message.php");
 require_once MYBB_ROOT . "inc/class_parser.php";
 
@@ -62,9 +63,9 @@ class MessagePoster
             )
         );
 
-        $addedMessage = new Message($addedId, $now, $user['username'], $ip, $message);
+        $formattedName = UsernameFormatter::Format($user['uid'], $user['username'], $user['usergroup'], $user['displaygroup']);
+        $addedMessage = new Message($addedId, $now, $formattedName, $ip, $message);
 
-        return new MessagePosterResult(MessagePosterResultStatus::$Success,
-                                       $addedMessage);
+        return new MessagePosterResult(MessagePosterResultStatus::$Success, $addedMessage);
     }
 }
