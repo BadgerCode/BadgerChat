@@ -9,3 +9,4 @@
 	add it to the template
 # Set up JavaScript configs for index page
     - Just load request URL now
+# Move CSS to separate file and include by modifying the headerinclude template on activate/deactivate

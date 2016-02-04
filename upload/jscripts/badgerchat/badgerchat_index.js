@@ -19,7 +19,8 @@ $(document).ready(function(){
     }
 
     function AddMessage(message){
-        chatBoxBody.append("<div class=\"badgerchat-index-chatbox-row\">" + message.User + ": " + message.Message + "</div>");
+        chatBoxBody.append("<div class=\"badgerchat-index-chatbox-row\">" + message.User
+                            + ": <div class=\"badgerchat-index-chatbox-row-message\">" + message.Message + "</div></div>");
     }
 
     function RenderMessages(messages){
