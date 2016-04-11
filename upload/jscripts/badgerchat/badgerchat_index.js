@@ -8,6 +8,7 @@ $(document).ready(function(){
             function(messages){
                 ClearMessages();
                 RenderMessages(messages);
+                ScrollToBottomOfMessages();
             }, function(){
                 console.log("Error loading messages");
             }
@@ -19,7 +20,8 @@ $(document).ready(function(){
     }
 
     function AddMessage(message){
-        chatBoxBody.append("<div class=\"badgerchat-index-chatbox-row\">" + message.User + ": " + message.Message + "</div>");
+        chatBoxBody.append("<div class=\"badgerchat-index-chatbox-row\">" + message.User
+                            + ": <div class=\"badgerchat-index-chatbox-row-message\">" + message.Message + "</div></div>");
     }
 
     function RenderMessages(messages){
@@ -38,12 +40,37 @@ $(document).ready(function(){
                 inputBox.attr("disabled", false);
 
                 // TODO: Use returned message object
+                var isAtBottom = IsScrolledToBottom();
                 AddMessage(addedMessage);
+
+                if(isAtBottom){
+                    ScrollToBottomOfMessages();
+                }
             }, function(reason){
                 console.log("Failed: " + reason);
                 inputBox.attr("disabled", false);
             }
         );
+    }
+
+    function IsScrolledToBottom(){
+        /*
+         http://stackoverflow.com/questions/18614301/keep-overflow-div-scrolled-to-bottom-unless-user-scrolls-up
+         dotnetCarpenter
+         */
+        var messageContainerElement = chatBoxBody[0];
+        var chromeScrollInaccuracy = 1;
+        return messageContainerElement.scrollHeight - messageContainerElement.clientHeight
+                <= messageContainerElement.scrollTop + chromeScrollInaccuracy;
+    }
+
+    function ScrollToBottomOfMessages(){
+        /*
+         http://stackoverflow.com/questions/18614301/keep-overflow-div-scrolled-to-bottom-unless-user-scrolls-up
+         dotnetCarpenter
+         */
+        var messageContainerElement = chatBoxBody[0];
+        messageContainerElement.scrollTop = messageContainerElement.scrollHeight - messageContainerElement.clientHeight;
     }
 
     // TODO: Check if enter is pressed in input and submit message
